@@ -56,7 +56,6 @@ namespace Aiba.FaceTracking
                     @"Enter the connection details to you face tracking app.",
                 style =
                 {
-                    textOverflow = new StyleEnum<TextOverflow>(StyleKeyword.Auto),
                     paddingBottom = new StyleLength { value = new Length { value = 8, unit = LengthUnit.Pixel } },
                     maxWidth = new StyleLength { value = new Length { value = 100, unit = LengthUnit.Percent } },
                 }
@@ -110,7 +109,6 @@ namespace Aiba.FaceTracking
                     @"Adjust the smoothing values for your transforms & blendshapes.\nThis will help with reducing model jitter.",
                 style =
                 {
-                    textOverflow = new StyleEnum<TextOverflow>(StyleKeyword.Auto),
                     paddingBottom = new StyleLength { value = new Length { value = 8, unit = LengthUnit.Pixel } },
                     maxWidth = new StyleLength { value = new Length { value = 100, unit = LengthUnit.Percent } },
                 }
@@ -119,13 +117,13 @@ namespace Aiba.FaceTracking
             foldout.Add(new Label { text = "Transform Smoothing" });
             foldout.Add(new Slider
             {
-                bindingPath = "transformSmoothTime", lowValue = 0, highValue = 1f, value = .1f, showInputField = true
+                bindingPath = "transformSmoothTime", lowValue = 0, highValue = 1f, value = .1f
             });
 
             foldout.Add(new Label { text = "Blendshape Smoothing" });
             foldout.Add(new Slider
             {
-                bindingPath = "blendShapeSmoothTime", lowValue = 0, highValue = 1f, value = .1f, showInputField = true
+                bindingPath = "blendShapeSmoothTime", lowValue = 0, highValue = 1f, value = .1f
             });
 
             _root.Add(foldout);
@@ -144,7 +142,6 @@ namespace Aiba.FaceTracking
                     "Adjust the curves to change how sensitive each blendshape is.",
                 style =
                 {
-                    textOverflow = new StyleEnum<TextOverflow>(StyleKeyword.Auto),
                     paddingBottom = new StyleLength { value = new Length { value = 8, unit = LengthUnit.Pixel } },
                     maxWidth = new StyleLength { value = new Length { value = 100, unit = LengthUnit.Percent } },
                 }
@@ -152,13 +149,13 @@ namespace Aiba.FaceTracking
 
             var ks = new SensGroup[]
             {
-                new(VRMFaceTracking.LeftEyeGroup, "leftEyeCurve"),
-                new(VRMFaceTracking.RightEyeGroup, "rightEyeCurve"),
-                new(VRMFaceTracking.MouthGroup, "mouthCurve"),
-                new(VRMFaceTracking.JawGroup, "jawCurve"),
-                new(VRMFaceTracking.TongueGroup, "tongueCurve"),
-                new(VRMFaceTracking.NoseGroup, "noseCurve"),
-                new(VRMFaceTracking.CheekGroup, "cheekCurve"),
+                new SensGroup(VRMFaceTracking.LeftEyeGroup, "leftEyeCurve"),
+                new SensGroup(VRMFaceTracking.RightEyeGroup, "rightEyeCurve"),
+                new SensGroup(VRMFaceTracking.MouthGroup, "mouthCurve"),
+                new SensGroup(VRMFaceTracking.JawGroup, "jawCurve"),
+                new SensGroup(VRMFaceTracking.TongueGroup, "tongueCurve"),
+                new SensGroup(VRMFaceTracking.NoseGroup, "noseCurve"),
+                new SensGroup(VRMFaceTracking.CheekGroup, "cheekCurve"),
             };
 
             foreach (var k in ks)

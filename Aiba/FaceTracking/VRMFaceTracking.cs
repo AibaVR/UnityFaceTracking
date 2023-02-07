@@ -9,8 +9,10 @@ using VRM;
 
 namespace Aiba.FaceTracking
 {
-    public class VRMFaceTracking : uOscServer
+    public class VRMFaceTracking : MonoBehaviour
     {
+        private OscServer _oscServer = new OscServer();
+
         public Vector3 offset = Vector3.zero;
 
         public bool trackFace = true;
@@ -32,7 +34,7 @@ namespace Aiba.FaceTracking
         public AnimationCurve noseCurve = AnimationCurve.Linear(0, 0, 1, 1);
         public AnimationCurve cheekCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
-        private readonly Dictionary<string, string> _allShapes = new()
+        private readonly Dictionary<string, string> _allShapes = new Dictionary<string, string>
         {
             { "EyeBlinkLeft", LeftEyeGroup },
             { "EyeLookDownLeft", LeftEyeGroup },
@@ -133,13 +135,18 @@ namespace Aiba.FaceTracking
         public string hipsName = "Hips";
         private Transform _hips;
 
+        // OSC Params
+        public int port = 39541;
+        public bool autoStart = true;
+
         // Start is called before the first frame update
         private void Start()
         {
 #if UNITY_EDITOR
-            _onDataReceivedEditor.AddListener(HandleVmcMessage);
+
+            _oscServer.OnDataReceivedEditor.AddListener(HandleVmcMessage);
 #else
-            onDataReceived.AddListener(HandleVmcMessage);
+            _oscServer.onDataReceived.AddListener(HandleVmcMessage);
 #endif
 
             // Init Vars
@@ -205,10 +212,11 @@ namespace Aiba.FaceTracking
         }
 
         // Update is called once per frame
-        private new void Update()
+        private void Update()
         {
-            base.Update();
-            
+            _oscServer.UpdatePort(port);
+            _oscServer.UpdateReceive();
+
             if (trackFace)
             {
                 UpdateBlendShapes();
@@ -219,6 +227,24 @@ namespace Aiba.FaceTracking
                 UpdateRoot();
                 UpdateBones();
             }
+        }
+
+        void Awake()
+        {
+            _oscServer.UpdatePort(port);
+        }
+
+        void OnEnable()
+        {
+            if (autoStart)
+            {
+                _oscServer.StartServer();
+            }
+        }
+
+        void OnDisable()
+        {
+            _oscServer.StopServer();
         }
 
         private void UpdateRoot()
@@ -264,17 +290,25 @@ namespace Aiba.FaceTracking
         {
             var group = _allShapes[bsName];
 
-            return group switch
+            switch (group)
             {
-                "Left Eye" => leftEyeCurve,
-                "Right Eye" => rightEyeCurve,
-                "Mouth" => mouthCurve,
-                "Jaw" => jawCurve,
-                "Tongue" => tongueCurve,
-                "Nose" => noseCurve,
-                "Cheek" => cheekCurve,
-                _ => AnimationCurve.Linear(0, 0, 1, 1)
-            };
+                case "Left Eye":
+                    return leftEyeCurve;
+                case "Right Eye":
+                    return rightEyeCurve;
+                case "Mouth":
+                    return mouthCurve;
+                case "Jaw":
+                    return jawCurve;
+                case "Tongue":
+                    return tongueCurve;
+                case "Nose":
+                    return noseCurve;
+                case "Cheek":
+                    return cheekCurve;
+                default:
+                    return AnimationCurve.Linear(0, 0, 1, 1);
+            }
         }
 
         private Tuple<Vector3, Quaternion> GetTupleFromValues(IReadOnlyList<object> values)
@@ -348,15 +382,21 @@ namespace Aiba.FaceTracking
         [CanBeNull]
         private Transform GetTransformFromName(string tName)
         {
-            return tName switch
+            switch (tName)
             {
-                "Head" => _head,
-                "Neck" => _neck,
-                "Chest" => _chest,
-                "Spine" => _spine,
-                "Hips" => _hips,
-                _ => null
-            };
+                case "Head":
+                    return _head;
+                case "Neck":
+                    return _neck;
+                case "Chest":
+                    return _chest;
+                case "Spine":
+                    return _spine;
+                case "Hips":
+                    return _hips;
+                default:
+                    return null;
+            }
         }
     }
 
